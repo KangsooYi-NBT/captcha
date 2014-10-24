@@ -1,17 +1,25 @@
 package main
 
 import "../../go-captcha"
+import "fmt"
 import "os"
 import "io"
 
 func main() {
-	file, _ := os.Create("test.png")
-	defer file.Close()
+	file1, _ := os.Create("test1.png")
+	file2, _ := os.Create("test2.png")
+	defer file1.Close()
+	defer file2.Close()
 
 	var w io.WriterTo
-	d := captcha.RandomDigits(6)
 
-	w = captcha.NewImage("", d, 150, 50)
+	digits := captcha.RandomDigits(6)
+	exp, result := captcha.RandomExp()
 
-	_, _ = w.WriteTo(file)
+	w = captcha.NewImage("", digits, 150, 50)
+	_, _ = w.WriteTo(file1)
+	w = captcha.NewImage("", exp, 150, 50)
+	_, _ = w.WriteTo(file2)
+
+	fmt.Printf("result: %d", result)
 }
