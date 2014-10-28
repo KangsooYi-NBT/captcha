@@ -5,7 +5,7 @@ import "strconv"
 import "bytes"
 
 // generate a random uuid
-func uuidV4() (uuid string, err error) {
+func NewUID() (uuid string, err error) {
 	u := new([16]byte)
 	_, err = rand.Read(u[:])
 

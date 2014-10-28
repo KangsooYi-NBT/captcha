@@ -4,20 +4,20 @@ import "testing"
 
 func TestRandomNum(t *testing.T) {
 	for i := 0; i < 10; i++ {
-		d := randomNum()
+		num := randomNum()
 
-		t.Log(d)
+		t.Log(num)
 
-		if d < min || d > max {
-			t.Fatal(d)
+		if num < min || num > max {
+			t.Fatal(num)
 		}
 	}
 }
 
 func TestRandomExp(t *testing.T) {
 	for i := 0; i < 10; i++ {
-		e, r := RandomExp()
-		t.Log(e)
-		t.Log(r)
+		exp, result := RandomExp()
+		t.Log(exp)
+		t.Log(result)
 	}
 }

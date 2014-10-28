@@ -1,6 +1,7 @@
 package captcha
 
 import "math/rand"
+import "strconv"
 import "time"
 
 const (
@@ -25,21 +26,23 @@ func randomNum() int64 {
 }
 
 //
-func RandomExp() (exp []byte, result int64) {
+func RandomExp() (exp []byte, result string) {
 	first := randomNum()
 	second := randomNum()
 
 	ope := randomNum() % mod
-	// var result int64
+	var resultNum int64
 
 	switch ope {
 	case 0: // +
-		result = first + second
+		resultNum = first + second
 	case 1: // -
-		result = first - second
+		resultNum = first - second
 		// case 2:
 		// case 3:
 	}
+
+	result = strconv.FormatInt(resultNum, 10)
 
 	exp = make([]byte, 6)
 	exp[0] = byte(first / 10)
@@ -49,5 +52,5 @@ func RandomExp() (exp []byte, result int64) {
 	exp[4] = byte(second % 10)
 	exp[5] = byte(14)
 
-	return //exp, result
+	return
 }

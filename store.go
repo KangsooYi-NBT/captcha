@@ -64,10 +64,10 @@ type memcacheStore struct {
 	Client  *memcache.Client
 }
 
-func NewMemcacheStore(address string, expire int32) Store {
+func NewMemcacheStore(address string, expire int) Store {
 	s := new(memcacheStore)
 	s.Address = address
-	s.Expire = expire
+	s.Expire = int32(expire)
 
 	client := memcache.New(address)
 	s.Client = client

@@ -1,6 +1,6 @@
 package main
 
-import "../../go-captcha"
+import "github.com/onebook/go-captcha"
 import "fmt"
 import "os"
 import "io"
@@ -21,5 +21,5 @@ func main() {
 	w = captcha.NewImage("", exp, 150, 50)
 	_, _ = w.WriteTo(file2)
 
-	fmt.Printf("result: %d", result)
+	fmt.Printf("result: %s", result)
 }
