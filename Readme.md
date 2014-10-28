@@ -7,6 +7,8 @@ golang captcha service
 
 ### Base on
 * [dchest/captcha](https://github.com/dchest/captcha)
+* [bradfitz/gomemcache](https://github.com/bradfitz/gomemcache)
+* [garyburd/redigo](https://github.com/garyburd/redigo)
 
 ### License
 MIT

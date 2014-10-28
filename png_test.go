@@ -2,6 +2,8 @@ package captcha
 
 import "testing"
 
+const DefaultLen = 6
+
 type byteCounter struct {
 	n int64
 }
