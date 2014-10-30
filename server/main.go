@@ -1,10 +1,18 @@
 package main
 
 import "github.com/onebook/go-captcha"
+import "math/rand"
 import "net/http"
 import "strconv"
+import "time"
 import "fmt"
 import "os"
+
+var cachedCaptchaQuene []cachedCaptcha
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
 
 func main() {
 	stype, saddress, expire, domain := parseArgs(os.Args)
@@ -18,10 +26,7 @@ func main() {
 	}
 
 	http.HandleFunc("/captcha", func(res http.ResponseWriter, req *http.Request) {
-		exp, result := captcha.RandomExp()
-		img := captcha.NewImage("", exp, 150, 50)
-
-		uid, _ := captcha.NewUID()
+		uid, result, png := getCaptcha()
 
 		// set store
 		store.Set(uid, result)
@@ -38,15 +43,17 @@ func main() {
 
 		res.WriteHeader(200)
 		res.Header().Set("Content-Type", "image/png")
-		res.Write(img.EncodedPNG())
+		res.Write(png)
 	})
 
 	fmt.Println("captcha serve on port: 3000")
 	http.ListenAndServe(":3000", nil)
 }
 
+// parse args
 func parseArgs(args []string) (stype, saddress string, expire int, domain string) {
 	var err error
+	var cache int
 
 	for k, v := range args {
 		switch v {
@@ -56,24 +63,72 @@ func parseArgs(args []string) (stype, saddress string, expire int, domain string
 			saddress = args[k+1]
 		case "--expire":
 			expire, err = strconv.Atoi(args[k+1])
+			assert(err == nil, "expire must be an integer")
 		case "--domain":
 			domain = args[k+1]
+		case "--cache":
+			cache, err = strconv.Atoi(args[k+1])
+			assert(err == nil, "cache must be an integer")
 		}
 	}
 
-	if err != nil {
-		fmt.Println("expire must be an integer")
-		os.Exit(1)
+	assert(stype == "redis" || stype == "memcache", "stype must be redis or memcache")
+	assert(saddress != "", "saddress required")
+
+	if cache > 0 {
+		initCache(cache)
 	}
 
-	if stype != "redis" && stype != "memcache" {
-		fmt.Println("stype must be redis or memcache")
+	return
+}
+
+func assert(ok bool, msg string) {
+	if !ok {
+		fmt.Println(msg)
 		os.Exit(1)
 	}
+}
 
-	if saddress == "" {
-		fmt.Println("saddress required")
-		os.Exit(1)
+// init cache
+func initCache(num int) {
+	cachedCaptchaQuene = make([]cachedCaptcha, num)
+
+	for i := 0; i < num; i++ {
+		exp, result := captcha.RandomExp()
+		img := captcha.NewImage("", exp, 150, 50)
+
+		newCaptcha := cachedCaptcha{
+			Result: result,
+			Img:    img.EncodedPNG(),
+		}
+
+		cachedCaptchaQuene[i] = newCaptcha
+	}
+
+	fmt.Println("captcha cache finished")
+}
+
+type cachedCaptcha struct {
+	Result string
+	Img    []byte
+}
+
+func getCaptcha() (uid string, result string, png []byte) {
+	var num = len(cachedCaptchaQuene)
+
+	uid, _ = captcha.NewUID()
+
+	if num > 0 {
+		// from cache
+		index := rand.Int() % num
+
+		result = cachedCaptchaQuene[index].Result
+		png = cachedCaptchaQuene[index].Img
+	} else {
+		var exp []byte
+		exp, result = captcha.RandomExp()
+		img := captcha.NewImage("", exp, 150, 50)
+		png = img.EncodedPNG()
 	}
 
 	return
