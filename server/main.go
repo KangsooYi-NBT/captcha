@@ -30,19 +30,11 @@ func main() {
 
 		// set store
 		store.Set(uid, result)
-		// set cookie
-		http.SetCookie(res, &http.Cookie{
-			Name:     "captchaId",
-			Value:    uid,
-			Path:     "/",
-			Domain:   domain,
-			MaxAge:   expire,
-			Secure:   false,
-			HttpOnly: true,
-		})
 
-		res.WriteHeader(200)
 		res.Header().Set("Content-Type", "image/png")
+		// &http.Cookie{...}.String() will remove the dot prefix from domain
+		res.Header().Set("Set-Cookie", "captchaId="+uid+"; Path=/; Domain="+domain+"; Max-Age="+strconv.Itoa(expire)+"; HttpOnly")
+		res.WriteHeader(200)
 		res.Write(png)
 	})
 
