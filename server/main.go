@@ -15,7 +15,7 @@ func init() {
 }
 
 func main() {
-	stype, saddress, expire, domain := parseArgs(os.Args)
+	port, stype, saddress, expire, domain := parseArgs(os.Args)
 
 	var store captcha.Store
 
@@ -38,17 +38,22 @@ func main() {
 		res.Write(png)
 	})
 
-	fmt.Println("captcha serve on port: 3000")
-	http.ListenAndServe(":3000", nil)
+	fmt.Println("captcha serve on port" + port)
+	http.ListenAndServe(port, nil)
 }
 
 // parse args
-func parseArgs(args []string) (stype, saddress string, expire int, domain string) {
+func parseArgs(args []string) (port, stype, saddress string, expire int, domain string) {
 	var err error
 	var cache int
 
 	for k, v := range args {
 		switch v {
+		case "--port":
+			p, e := strconv.Atoi(args[k+1])
+			assert(e == nil, "port must be a number")
+			assert(p > 0, "port must above 0")
+			port = ":" + args[k+1]
 		case "--stype":
 			stype = args[k+1]
 		case "--saddress":
@@ -66,6 +71,7 @@ func parseArgs(args []string) (stype, saddress string, expire int, domain string
 
 	assert(stype == "redis" || stype == "memcache", "stype must be redis or memcache")
 	assert(saddress != "", "saddress required")
+	assert(len(port) > 1, "port required")
 
 	if cache > 0 {
 		initCache(cache)
