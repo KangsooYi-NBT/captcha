@@ -4,7 +4,6 @@ import "crypto/rand"
 import "strconv"
 import "bytes"
 
-// generate a random uuid
 func NewUID() (uuid string, err error) {
 	u := new([16]byte)
 	_, err = rand.Read(u[:])

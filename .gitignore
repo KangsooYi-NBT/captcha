@@ -1,2 +1,4 @@
-*.png
+server/server
+server/main
 captcha
+*.png
