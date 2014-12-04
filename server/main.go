@@ -1,6 +1,6 @@
 package main
 
-import "github.com/onebook/go-captcha"
+import "github.com/onebook/captcha"
 import "math/rand"
 import "net/http"
 import "strconv"
@@ -45,6 +45,8 @@ func main() {
 		// set store (TODO: error handle)
 		store.Set(uid, result)
 
+		// close connection
+		res.Header().Set("Connection", "close")
 		res.Header().Set("Content-Type", "image/png")
 		// &http.Cookie{...}.String() will remove the dot prefix from domain
 		res.Header().Set("Set-Cookie", "captchaId="+uid+"; Path=/; Domain="+*domain+"; Max-Age="+strconv.Itoa(*expire)+"; HttpOnly")
