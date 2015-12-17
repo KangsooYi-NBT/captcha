@@ -7,6 +7,7 @@ import "time"
 type Store interface {
 	Set(id string, result string) error
 	Get(id string) (string, error)
+	Del(id string) (string, error)
 }
 
 // redis store
@@ -57,6 +58,17 @@ func (s *redisStore) Get(id string) (result string, err error) {
 	return
 }
 
+func (s *redisStore) Del(id string) (result string, err error) {
+	data, err := s.Pool.Get().Do("DEL", id)
+	if data == nil {
+		result = ""
+	} else {
+		result = "SUCCESS"
+	}
+
+	return
+}
+
 // memcache store
 type memcacheStore struct {
 	Address string
@@ -91,5 +103,16 @@ func (s *memcacheStore) Get(id string) (result string, err error) {
 	}
 
 	result = string(item.Value)
+	return
+}
+
+func (s *memcacheStore) Del(id string) (result string, err error) {
+	err = s.Client.Delete(id)
+
+	if err != nil {
+		return "", err
+	}
+
+	result = "SUCCESS"
 	return
 }

@@ -5,8 +5,8 @@ import "strconv"
 import "time"
 
 const (
-	min = 10
-	max = 99
+	min = 9 // 10
+	max = 500
 	mod = 2 // could be: 1, 2, 3, 4
 )
 
@@ -15,10 +15,9 @@ func init() {
 }
 
 //
-func randomNum() int64 {
+func randomNum(max int64) int64 {
 	i := rand.Int63n(max)
-
-	if i < min {
+	if i < 100 {
 		return max - min + i
 	}
 
@@ -27,10 +26,10 @@ func randomNum() int64 {
 
 //
 func RandomExp() (exp []byte, result string) {
-	first := randomNum()
-	second := randomNum()
+	first := randomNum(max)
+	second := randomNum(min)
 
-	ope := randomNum() % mod
+	ope := randomNum(min) % mod
 	var resultNum int64
 
 	switch ope {
@@ -45,10 +44,11 @@ func RandomExp() (exp []byte, result string) {
 	result = strconv.FormatInt(resultNum, 10)
 
 	exp = make([]byte, 6)
-	exp[0] = byte(first / 10)
-	exp[1] = byte(first % 10)
-	exp[2] = byte(10 + ope)
-	exp[3] = byte(second / 10)
+	x := first % 100
+	exp[0] = byte(first / 100)
+	exp[1] = byte(x / 10)
+	exp[2] = byte(x % 10)
+	exp[3] = byte(10 + ope)
 	exp[4] = byte(second % 10)
 	exp[5] = byte(14)
 
